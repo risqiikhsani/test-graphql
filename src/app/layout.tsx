@@ -32,7 +32,10 @@ export default function RootLayout({
         )}
       >
         <CustomApolloProvider>
-        {children}
+          <div className="container">
+          {children}
+          </div>
+        
         </CustomApolloProvider>
         
         </body>
