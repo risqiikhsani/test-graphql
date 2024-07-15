@@ -9,6 +9,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -33,33 +34,27 @@ const CREATE_PRODUCT = gql`
             name
             quantity
             user
+            description
+            time_creation
         }
     }
 `;
-// Utility function to generate a random string
-function generateRandomString(length: number) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
+
 
 const formSchema = z.object({
     name: z.string().min(2).max(50),
     user: z.string().min(2).max(50),
+    description: z.string(),
     quantity: z.number().min(1).max(1000),
 })
 
 export default function CreateProduct() {
     const [createProduct, { data, loading, error }] = useMutation(CREATE_PRODUCT, {
         refetchQueries: [
-          GET_PRODUCTS, // DocumentNode object parsed with gql
-          'GetProducts' // Query name
+            GET_PRODUCTS, // DocumentNode object parsed with gql
+            'GetProducts' // Query name
         ],
-      });
+    });
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -67,14 +62,15 @@ export default function CreateProduct() {
         defaultValues: {
             name: "",
             user: "",
+            description: "",
             quantity: 1
         },
     })
 
     // 2. Define a submit handler.
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const id = generateRandomString(10); // Generate a random ID with 10 characters
-        const input = { ...values, id };
+
+        const input = { ...values};
 
         try {
             await createProduct({
@@ -133,6 +129,23 @@ export default function CreateProduct() {
                             />
                             <FormField
                                 control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Product description"
+                                                className="resize-none"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
                                 name="quantity"
                                 render={({ field }) => (
                                     <FormItem>
@@ -146,9 +159,9 @@ export default function CreateProduct() {
                                 )}
                             />
                             <DialogClose asChild>
-                            <Button type="submit" variant="secondary">Submit</Button>
+                                <Button type="submit" variant="secondary">Submit</Button>
                             </DialogClose>
-                            
+
                         </form>
                     </Form>
                 </DialogContent>

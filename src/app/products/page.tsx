@@ -11,6 +11,7 @@ import {
 
 import { useQuery, gql } from '@apollo/client';
 import CreateProduct from "./_page/create-product";
+import Product from "./_page/product";
 
 export const GET_PRODUCTS = gql`
     query GetProducts {
@@ -20,6 +21,8 @@ export const GET_PRODUCTS = gql`
                 name
                 quantity
                 user
+                description
+                time_creation
             }
         }
     }
@@ -35,18 +38,7 @@ export default function Page() {
             <div className="flex flex-col gap-2 p-4">
                 <CreateProduct />
                 {products_data.listProducts.items.map((p: any) => (
-                    <Card key={p.id}>
-                        <CardHeader>
-                            <CardTitle>{p.name}</CardTitle>
-                            <CardDescription>{p.user}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p>Card Content</p>
-                        </CardContent>
-                        <CardFooter>
-                            <p>{p.quantity}</p>
-                        </CardFooter>
-                    </Card>
+                    <Product data={p}/>
                 ))}
             </div>
 
