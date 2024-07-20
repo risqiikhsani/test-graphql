@@ -27,9 +27,9 @@ import { Input } from "@/components/ui/input"
 import { gql, useMutation } from '@apollo/client';
 import { GET_PRODUCTS } from "../page"
 // Define mutation
-const CREATE_PRODUCT = gql`
-    mutation CreateProduct($input: CreateProductInput!) {
-        createProduct(input: $input) {
+const UPDATE_PRODUCT = gql`
+    mutation UpdateProduct($input: UpdateProductInput!) {
+        updateProduct(input: $input) {
             id
             name
             quantity
@@ -43,13 +43,12 @@ const CREATE_PRODUCT = gql`
 
 const formSchema = z.object({
     name: z.string().min(2).max(50),
-    user: z.string().min(2).max(50),
     description: z.string(),
     quantity: z.number().min(1).max(1000),
 })
 
-export default function CreateProduct() {
-    const [createProduct, { data, loading, error }] = useMutation(CREATE_PRODUCT, {
+export default function UpdateProduct({product}:{product:any}) {
+    const [updateProduct, { data, loading, error }] = useMutation(UPDATE_PRODUCT, {
         refetchQueries: [
             GET_PRODUCTS, // DocumentNode object parsed with gql
             'GetProducts' // Query name
@@ -60,28 +59,27 @@ export default function CreateProduct() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            user: "",
-            description: "",
-            quantity: 1
+            name: product.name,
+            description: product.description,
+            quantity: product.quantity
         },
     })
 
     // 2. Define a submit handler.
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
 
-        const input = { ...values};
+        const input = { ...values, id:product.id, user:product.user};
 
         try {
-            await createProduct({
+            await updateProduct({
                 variables: {
                     input,
                 },
             });
             form.reset();
-            console.log("Product created successfully", data);
+            console.log("Product updated successfully", data);
         } catch (err) {
-            console.error("Error creating product", err);
+            console.error("Error updating product", err);
         }
     };
 
@@ -89,16 +87,16 @@ export default function CreateProduct() {
         <>
             <Dialog>
                 <DialogTrigger>
-                    <Button>Create Product</Button>
+                    <Button>Update</Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Create Product</DialogTitle>
+                        <DialogTitle>Update Product</DialogTitle>
                         <DialogDescription>
-                            Create new product
+                            Update product
                         </DialogDescription>
                     </DialogHeader>
-                    {loading && <p>creating ...</p>}
+                    {loading && <p>updating ...</p>}
                     {error && <p>Error : {error.message}</p>}
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -110,19 +108,6 @@ export default function CreateProduct() {
                                         <FormLabel>name</FormLabel>
                                         <FormControl>
                                             <Input placeholder="name product" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="user"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>user</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="user" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

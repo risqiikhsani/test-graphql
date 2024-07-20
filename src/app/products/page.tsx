@@ -18,11 +18,11 @@ export const GET_PRODUCTS = gql`
         listProducts(limit: 10) {
             items {
                 id
-                name
-                quantity
                 user
-                description
+                name
                 time_creation
+                quantity
+                description
             }
         }
     }

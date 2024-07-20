@@ -7,26 +7,29 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import Link from 'next/link'
+import UpdateProduct from "./update-product";
+import DeleteProduct from "./delete-product";
 
-export default function Product({data}:{data:any}) {
+
+export default function Product({ data }: { data: any }) {
     return (
         <>
-            <Card key={data.id}>
-                <CardHeader>
+            <div key={data.id} className="border border-md border-yellow-400 rounded-lg p-2">
+                <div>
                     <CardTitle>{data.name}</CardTitle>
                     <CardDescription>{data.user}</CardDescription>
-                    <p>{data.quantity} units</p>
                     <p>created : {data.time_creation}</p>
-                </CardHeader>
-                <CardContent>
-                    <p>{data.description}</p>
-                </CardContent>
-                <CardFooter className="flex gap-2">
+                </div>
+                <div className="flex gap-2">
                     <div className="flex-1"></div>
-                    <Button>Update</Button>
-                    <Button>Delete</Button>
-                </CardFooter>
-            </Card>
+                    <UpdateProduct product={data}/>
+                    <DeleteProduct product={data}/>
+                    <Button variant="link">
+                        <Link href={`products/${data.id}/${data.user}`}>Visit</Link>
+                    </Button>
+                </div>
+            </div>
         </>
     )
 }
